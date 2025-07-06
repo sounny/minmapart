@@ -10,37 +10,72 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
 // Search provider using OpenStreetMap
 const provider = new GeoSearch.OpenStreetMapProvider();
 const searchInput = document.getElementById('search');
+const searchBtn = document.getElementById('search-btn');
+const suggestions = document.getElementById('suggestions');
+const titleInput = document.getElementById('title');
+const titleText = document.getElementById('title-text');
+const coordText = document.getElementById('coord-text');
+let lastCoords = map.getCenter();
 
-searchInput.addEventListener('keyup', async (e) => {
-  if (e.key !== 'Enter') return;
+function toDMS(deg) {
+  const d = Math.floor(Math.abs(deg));
+  const minFloat = (Math.abs(deg) - d) * 60;
+  const m = Math.floor(minFloat);
+  const s = ((minFloat - m) * 60).toFixed(2);
+  return `${d}°${m}'${s}"`;
+}
+
+function formatCoords(lat, lng) {
+  const latDir = lat >= 0 ? 'N' : 'S';
+  const lngDir = lng >= 0 ? 'E' : 'W';
+  return `${toDMS(lat)}${latDir} ${toDMS(lng)}${lngDir}`;
+}
+
+function updateOverlay(lat, lng) {
+  titleText.textContent = titleInput.value;
+  coordText.textContent = formatCoords(lat, lng);
+  lastCoords = {lat, lng};
+}
+
+searchInput.addEventListener('input', async (e) => {
+  if (!e.target.value) {
+    suggestions.innerHTML = '';
+    return;
+  }
   const results = await provider.search({ query: e.target.value });
+  suggestions.innerHTML = '';
+  results.slice(0,5).forEach(r => {
+    const option = document.createElement('option');
+    option.value = r.label;
+    suggestions.appendChild(option);
+  });
+});
+
+async function performSearch() {
+  const query = searchInput.value;
+  if (!query) return;
+  const results = await provider.search({ query });
   if (results.length === 0) return;
   const { x, y } = results[0];
   map.setView([y, x], 14);
-  L.marker([y, x]).addTo(map);
+  updateOverlay(y, x);
+}
+
+searchBtn.addEventListener('click', performSearch);
+searchInput.addEventListener('keyup', (e) => {
+  if (e.key === 'Enter') performSearch();
+});
+
+titleInput.addEventListener('input', () => {
+  updateOverlay(lastCoords.lat, lastCoords.lng);
 });
 
 // Export map and title as PDF
 const exportBtn = document.getElementById('export');
-const titleInput = document.getElementById('title');
 
 exportBtn.addEventListener('click', () => {
-  const container = document.getElementById('map');
-  const titleText = titleInput.value;
+  const container = document.getElementById('preview');
 
-  // Create temporary title overlay
-  const titleDiv = document.createElement('div');
-  titleDiv.style.position = 'absolute';
-  titleDiv.style.top = '10px';
-  titleDiv.style.left = '50%';
-  titleDiv.style.transform = 'translateX(-50%)';
-  titleDiv.style.fontSize = '18px';
-  titleDiv.style.fontWeight = 'bold';
-  titleDiv.style.pointerEvents = 'none';
-  titleDiv.innerText = titleText;
-  container.appendChild(titleDiv);
-
-  // Render map + title to canvas
   html2canvas(container, { useCORS: true }).then((canvas) => {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
@@ -50,6 +85,5 @@ exportBtn.addEventListener('click', () => {
     });
     pdf.addImage(canvas, 'PNG', 0, 0, canvas.width, canvas.height);
     pdf.save('map.pdf');
-    container.removeChild(titleDiv);
   });
 });
