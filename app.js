@@ -80,10 +80,10 @@ exportBtn.addEventListener('click', () => {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({
       orientation: 'landscape',
-      unit: 'pt',
-      format: [canvas.width, canvas.height]
+      unit: 'in',
+      format: [17, 11]
     });
-    pdf.addImage(canvas, 'PNG', 0, 0, canvas.width, canvas.height);
+    pdf.addImage(canvas, 'PNG', 0, 0, 17, 11);
     pdf.save('map.pdf');
   });
 });
