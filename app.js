@@ -15,6 +15,8 @@ const suggestions = document.getElementById('suggestions');
 const titleInput = document.getElementById('title');
 const titleText = document.getElementById('title-text');
 const coordText = document.getElementById('coord-text');
+const orientationBtn = document.getElementById('orientation-btn');
+let orientation = 'landscape';
 let lastCoords = map.getCenter();
 
 function toDMS(deg) {
@@ -70,6 +72,25 @@ titleInput.addEventListener('input', () => {
   updateOverlay(lastCoords.lat, lastCoords.lng);
 });
 
+function updateOrientation() {
+  const preview = document.getElementById('preview');
+  if (orientation === 'landscape') {
+    preview.style.aspectRatio = '17 / 11';
+    orientationBtn.textContent = 'Switch to Portrait';
+  } else {
+    preview.style.aspectRatio = '11 / 17';
+    orientationBtn.textContent = 'Switch to Landscape';
+  }
+  map.invalidateSize();
+}
+
+orientationBtn.addEventListener('click', () => {
+  orientation = orientation === 'landscape' ? 'portrait' : 'landscape';
+  updateOrientation();
+});
+
+updateOrientation();
+
 // Export map and title as PDF
 const exportBtn = document.getElementById('export');
 
@@ -78,12 +99,15 @@ exportBtn.addEventListener('click', () => {
 
   html2canvas(container, { useCORS: true }).then((canvas) => {
     const { jsPDF } = window.jspdf;
+    const isLandscape = orientation === 'landscape';
     const pdf = new jsPDF({
-      orientation: 'landscape',
+      orientation,
       unit: 'in',
-      format: [17, 11]
+      format: isLandscape ? [17, 11] : [11, 17]
     });
-    pdf.addImage(canvas, 'PNG', 0, 0, 17, 11);
+    const width = isLandscape ? 17 : 11;
+    const height = isLandscape ? 11 : 17;
+    pdf.addImage(canvas, 'PNG', 0, 0, width, height);
     pdf.save('map.pdf');
   });
 });
