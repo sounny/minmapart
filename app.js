@@ -1,11 +1,20 @@
 // Initialize map
-const map = L.map('map').setView([29.89, -81.31], 13);
+const map = L.map('map', {
+  zoomControl: false,
+  attributionControl: false
+}).setView([29.89, -81.31], 13);
 
 // Minimal basemap
 L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
   maxZoom: 19,
-  attribution: ''
+  attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
+
+const controlsContainer = document.getElementById('controls');
+const zoomControl = L.control.zoom().addTo(map);
+const attribution = L.control.attribution().addTo(map);
+controlsContainer.appendChild(zoomControl.getContainer());
+controlsContainer.appendChild(attribution.getContainer());
 
 // Search provider using OpenStreetMap
 const provider = new GeoSearch.OpenStreetMapProvider();
