@@ -17,6 +17,7 @@
       display: flex;
       flex-direction: column;
       background: #ddd;
+      padding-top: 3.5em; /* space for fixed header */
     }
 
     #page-container {
@@ -45,6 +46,19 @@
       flex: 1;
       border: 2px solid #000;
       position: relative;
+      overflow: hidden;
+      /* fade overlay using pseudo element */
+    }
+
+    #map::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4em;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(255, 255, 255, 0), #fff);
     }
 
     #title-text,
@@ -54,6 +68,7 @@
       width: 100%;
       text-align: center;
       pointer-events: none;
+      z-index: 1001;
     }
 
     #title-text {
@@ -73,6 +88,11 @@
       gap: 0.5em;
       padding: 0.5em;
       background: #f8f8f8;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
     }
 
     input,

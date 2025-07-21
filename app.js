@@ -28,6 +28,10 @@ const orientationBtn = document.getElementById('orientation-btn');
 let orientation = 'landscape';
 let lastCoords = map.getCenter();
 
+// Default placeholder title and coordinates for downtown Saint Augustine
+titleInput.value = 'Saint Augustine';
+updateOverlay(lastCoords.lat, lastCoords.lng);
+
 function toDMS(deg) {
   const d = Math.floor(Math.abs(deg));
   const minFloat = (Math.abs(deg) - d) * 60;
@@ -94,7 +98,11 @@ function updateOrientation() {
 }
 
 orientationBtn.addEventListener('click', () => {
+  const previous = orientation;
   orientation = orientation === 'landscape' ? 'portrait' : 'landscape';
+  if (previous === 'landscape' && orientation === 'portrait') {
+    map.zoomOut();
+  }
   updateOrientation();
 });
 
