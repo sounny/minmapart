@@ -86,6 +86,12 @@ titleInput.addEventListener('input', () => {
   updateOverlay(lastCoords.lat, lastCoords.lng);
 });
 
+// Update coordinates as the map pans
+map.on('move', () => {
+  const center = map.getCenter();
+  updateOverlay(center.lat, center.lng);
+});
+
 function updateOrientation() {
   const preview = document.getElementById('preview');
   if (orientation === 'landscape') {
