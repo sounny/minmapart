@@ -4,12 +4,13 @@ const map = L.map('map', {
   attributionControl: false
 }).setView([29.89, -81.31], 13);
 
-// Minimal basemap
-L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png', {
-  maxZoom: 19,
-  attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// Minimal basemap: Stadia Stamen Toner lines only
+L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png', {
+  minZoom: 0,
+  maxZoom: 20,
+  ext: 'png',
+  attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
-
 const controlsContainer = document.getElementById('controls');
 const zoomControl = L.control.zoom().addTo(map);
 const attribution = L.control.attribution().addTo(map);
