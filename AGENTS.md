@@ -7,3 +7,4 @@ This repository does not currently include automated tests. To help future agent
 - 2025-08-06: Updated the application's visual style for a more modern, minimalist aesthetic. Changed the basemap to Stamen Toner for a high-contrast, black-and-white look. Switched the font to "Roboto" and adjusted text sizes to make the place name more prominent.
 - 2025-08-06: Replaced Stamen Toner basemap with Stadia Stamen Toner lines to display only street lines for an even cleaner appearance.
 - 2025-08-06: Display map center coordinates during panning and lowered the title position to sit closer to the coordinate text.
+- 2025-08-13: Applied a white fade overlay to the bottom one-sixth of the map to improve text readability.
