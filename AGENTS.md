@@ -8,3 +8,4 @@ This repository does not currently include automated tests. To help future agent
 - 2025-08-06: Replaced Stamen Toner basemap with Stadia Stamen Toner lines to display only street lines for an even cleaner appearance.
 - 2025-08-06: Display map center coordinates during panning and lowered the title position to sit closer to the coordinate text.
 - 2025-08-13: Applied a white fade overlay to the bottom one-sixth of the map to improve text readability.
+- 2025-08-14: Increased fade to cover the bottom fifth of the map, moved the title closer to the coordinates, and switched overlay text to the narrower Roboto Condensed font.
