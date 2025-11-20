@@ -26,12 +26,15 @@ const titleInput = document.getElementById('title');
 const titleText = document.getElementById('title-text');
 const coordText = document.getElementById('coord-text');
 const orientationBtn = document.getElementById('orientation-btn');
+const locateBtn = document.getElementById('locate-btn');
+const status = document.getElementById('status');
 let orientation = 'landscape';
 let lastCoords = map.getCenter();
 
 // Default placeholder title and coordinates for downtown Saint Augustine
 titleInput.value = 'Saint Augustine';
 updateOverlay(lastCoords.lat, lastCoords.lng);
+setStatus('Search for a place, or center on your current location.');
 
 function toDMS(deg) {
   const d = Math.floor(Math.abs(deg));
@@ -53,6 +56,11 @@ function updateOverlay(lat, lng) {
   lastCoords = {lat, lng};
 }
 
+function setStatus(message, type = 'info') {
+  status.textContent = message;
+  status.className = type;
+}
+
 searchInput.addEventListener('input', async (e) => {
   if (!e.target.value) {
     suggestions.innerHTML = '';
@@ -69,12 +77,24 @@ searchInput.addEventListener('input', async (e) => {
 
 async function performSearch() {
   const query = searchInput.value;
-  if (!query) return;
-  const results = await provider.search({ query });
-  if (results.length === 0) return;
-  const { x, y } = results[0];
-  map.setView([y, x], 14);
-  updateOverlay(y, x);
+  if (!query) {
+    setStatus('Enter a place name to search.', 'info');
+    return;
+  }
+
+  try {
+    const results = await provider.search({ query });
+    if (results.length === 0) {
+      setStatus('No matching places found. Try another search.', 'error');
+      return;
+    }
+    const { x, y, label } = results[0];
+    map.setView([y, x], 14);
+    updateOverlay(y, x);
+    setStatus(`Centered on ${label}.`, 'success');
+  } catch (err) {
+    setStatus('Search temporarily unavailable. Please try again.', 'error');
+  }
 }
 
 searchBtn.addEventListener('click', performSearch);
@@ -90,6 +110,31 @@ titleInput.addEventListener('input', () => {
 map.on('move', () => {
   const center = map.getCenter();
   updateOverlay(center.lat, center.lng);
+});
+
+locateBtn.addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    setStatus('Geolocation is not supported in this browser.', 'error');
+    return;
+  }
+
+  setStatus('Fetching your location…', 'info');
+  locateBtn.disabled = true;
+
+  navigator.geolocation.getCurrentPosition(
+    ({ coords }) => {
+      const { latitude, longitude } = coords;
+      map.setView([latitude, longitude], 14);
+      updateOverlay(latitude, longitude);
+      setStatus('Centered on your current location.', 'success');
+      locateBtn.disabled = false;
+    },
+    () => {
+      setStatus('Unable to fetch your location. Check browser permissions.', 'error');
+      locateBtn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 8000 }
+  );
 });
 
 function updateOrientation() {
