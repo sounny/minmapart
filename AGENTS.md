@@ -13,3 +13,4 @@ This repository does not currently include automated tests. To help future agent
 - 2025-08-19: Raised bottom fade above road lines by setting pseudo-element z-index so street lines appear under the fade.
 - 2025-08-21: Added a center marker overlay, geolocation quick-center button, clearer status messaging, and refreshed control styling to guide users.
 - 2025-08-22: Softened the layout with a sticky, blurred control bar and resized the map preview to better fit on screen without overwhelming the UI.
+- 2025-12-14: Removed the center marker overlay and tightened title spacing toward the coordinates per latest feedback.
