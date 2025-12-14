@@ -80,7 +80,7 @@
     }
 
     #title-text {
-      bottom: 1.9em;
+      bottom: 1.3em;
       font-family: 'Roboto Condensed', sans-serif;
       font-size: clamp(38px, 5vw, 52px);
       font-weight: 700;
@@ -88,25 +88,10 @@
     }
 
     #coord-text {
-      bottom: 0.9em;
+      bottom: 0.7em;
       font-family: 'Roboto Condensed', sans-serif;
       font-size: clamp(14px, 2vw, 18px);
       letter-spacing: 0;
-    }
-
-    #center-marker {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 20px;
-      height: 20px;
-      border: 2px solid #111;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.7);
-      box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.4);
-      z-index: 1001;
-      pointer-events: none;
     }
 
     #controls {
@@ -197,7 +182,6 @@
   <div id="page-container">
     <div id="preview">
       <div id="map">
-        <div id="center-marker" aria-hidden="true"></div>
         <div id="title-text"></div>
         <div id="coord-text"></div>
       </div>
