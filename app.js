@@ -4,13 +4,33 @@ const map = L.map('map', {
   attributionControl: false
 }).setView([29.89, -81.31], 13);
 
-// Minimal basemap: Stadia Stamen Toner lines only
-L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png', {
-  minZoom: 0,
-  maxZoom: 20,
-  ext: 'png',
-  attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-}).addTo(map);
+const defaultView = { lat: 29.89, lng: -81.31, zoom: 13 };
+
+const tileAttribution = '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+const basemaps = {
+  lines: L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png', {
+    minZoom: 0,
+    maxZoom: 20,
+    ext: 'png',
+    attribution: tileAttribution,
+  }),
+  toner: L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png', {
+    minZoom: 0,
+    maxZoom: 20,
+    ext: 'png',
+    attribution: tileAttribution,
+  }),
+  lite: L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lite/{z}/{x}/{y}{r}.png', {
+    minZoom: 0,
+    maxZoom: 20,
+    ext: 'png',
+    attribution: tileAttribution,
+  }),
+};
+
+let activeBasemap = basemaps.lines;
+activeBasemap.addTo(map);
 const controlsContainer = document.getElementById('controls');
 const zoomControl = L.control.zoom().addTo(map);
 const attribution = L.control.attribution().addTo(map);
@@ -28,6 +48,10 @@ const coordText = document.getElementById('coord-text');
 const orientationBtn = document.getElementById('orientation-btn');
 const locateBtn = document.getElementById('locate-btn');
 const status = document.getElementById('status');
+const basemapSelect = document.getElementById('basemap-select');
+const copyCoordsBtn = document.getElementById('copy-coords');
+const resetBtn = document.getElementById('reset-btn');
+const zoomText = document.getElementById('zoom-text');
 let orientation = 'landscape';
 let lastCoords = map.getCenter();
 
@@ -35,6 +59,7 @@ let lastCoords = map.getCenter();
 titleInput.value = 'Saint Augustine';
 updateOverlay(lastCoords.lat, lastCoords.lng);
 setStatus('Search for a place, or center on your current location.');
+zoomText.textContent = `Zoom ${map.getZoom()}`;
 
 function toDMS(deg) {
   const d = Math.floor(Math.abs(deg));
@@ -112,6 +137,10 @@ map.on('move', () => {
   updateOverlay(center.lat, center.lng);
 });
 
+map.on('zoomend', () => {
+  zoomText.textContent = `Zoom ${map.getZoom()}`;
+});
+
 locateBtn.addEventListener('click', () => {
   if (!navigator.geolocation) {
     setStatus('Geolocation is not supported in this browser.', 'error');
@@ -137,6 +166,32 @@ locateBtn.addEventListener('click', () => {
   );
 });
 
+basemapSelect.addEventListener('change', (event) => {
+  const selected = basemaps[event.target.value];
+  if (!selected || selected === activeBasemap) return;
+  map.removeLayer(activeBasemap);
+  activeBasemap = selected;
+  activeBasemap.addTo(map);
+  setStatus('Basemap updated.', 'success');
+});
+
+copyCoordsBtn.addEventListener('click', async () => {
+  const coords = formatCoords(lastCoords.lat, lastCoords.lng);
+  try {
+    await navigator.clipboard.writeText(coords);
+    setStatus('Coordinates copied to clipboard.', 'success');
+  } catch (err) {
+    setStatus('Unable to copy coordinates. Try again.', 'error');
+  }
+});
+
+resetBtn.addEventListener('click', () => {
+  map.setView([defaultView.lat, defaultView.lng], defaultView.zoom);
+  updateOverlay(defaultView.lat, defaultView.lng);
+  searchInput.value = '';
+  setStatus('View reset to the default map.', 'info');
+});
+
 function updateOrientation() {
   const preview = document.getElementById('preview');
   if (orientation === 'landscape') {
@@ -159,6 +214,8 @@ orientationBtn.addEventListener('click', () => {
 });
 
 updateOrientation();
+
+L.control.scale({ position: 'bottomleft' }).addTo(map);
 
 // Export map and title as PDF
 const exportBtn = document.getElementById('export');
