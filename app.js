@@ -9,6 +9,24 @@ const defaultView = { lat: 29.89, lng: -81.31, zoom: 13 };
 const tileAttribution = '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://www.stamen.com/" target="_blank">Stamen Design</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 const basemaps = {
+  alidade_smooth: L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png', {
+    minZoom: 0,
+    maxZoom: 20,
+    ext: 'png',
+    attribution: tileAttribution,
+  }),
+  osm_bright: L.tileLayer('https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png', {
+    minZoom: 0,
+    maxZoom: 20,
+    ext: 'png',
+    attribution: tileAttribution,
+  }),
+  stamen_watercolor: L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg', {
+    minZoom: 1,
+    maxZoom: 16,
+    ext: 'jpg',
+    attribution: tileAttribution,
+  }),
   lines: L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner_lines/{z}/{x}/{y}{r}.png', {
     minZoom: 0,
     maxZoom: 20,
@@ -29,7 +47,7 @@ const basemaps = {
   }),
 };
 
-let activeBasemap = basemaps.lines;
+let activeBasemap = basemaps.alidade_smooth;
 activeBasemap.addTo(map);
 const controlsContainer = document.getElementById('controls');
 const zoomControl = L.control.zoom().addTo(map);
