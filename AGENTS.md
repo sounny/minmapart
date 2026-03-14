@@ -15,3 +15,5 @@ This repository does not currently include automated tests. To help future agent
 - 2025-08-22: Softened the layout with a sticky, blurred control bar and resized the map preview to better fit on screen without overwhelming the UI.
 - 2025-12-14: Removed the center marker overlay and tightened title spacing toward the coordinates per latest feedback.
 - 2025-12-16: Added basemap switching, quick copy/reset actions, zoom badge, and scale control to expand map-making tools and feedback.
+
+- 2026-03-14: Reworked the UI into a studio-style layout with a dedicated control panel, clearer hierarchy, and improved readability. Added shareable URL state, center/style readouts, debounced search suggestions, and stronger status feedback to make the product feel more polished and map-poster friendly.

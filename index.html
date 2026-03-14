@@ -2,59 +2,206 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Minimal Map Maker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MinMapArt Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
   <style>
-    body, html {
-      margin: 0;
-      height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
-        Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
-        Arial, sans-serif;
-      background: #f1f2f5;
-      color: #111;
+    :root {
+      --bg: #f3f5f8;
+      --panel: rgba(255, 255, 255, 0.92);
+      --text: #111827;
+      --muted: #5f6b7e;
+      --line: #d9dee7;
+      --accent: #0b63f6;
+      --accent-strong: #084fd0;
+      --radius: 14px;
+      --shadow: 0 10px 30px rgba(17, 24, 39, 0.09);
     }
 
-    body {
-      display: flex;
-      flex-direction: column;
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background:
+        radial-gradient(circle at top right, #e5ecff 0%, transparent 48%),
+        radial-gradient(circle at 10% 20%, #e8f4ef 0%, transparent 36%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    #app-shell {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: clamp(1rem, 2vw, 1.5rem);
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) 1fr;
+      gap: 1rem;
       min-height: 100vh;
     }
 
-    #page-container {
-      flex: 1;
+    #controls {
+      position: sticky;
+      top: 1rem;
+      align-self: start;
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.2rem, 2vw, 1.45rem);
+      letter-spacing: -0.02em;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+
+    .control-group {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0.8rem;
+      background: #fff;
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .group-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #4b5563;
+      margin: 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .field label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    input, select, button {
+      font: inherit;
+      border-radius: 10px;
+      border: 1px solid #cfd5df;
+      padding: 0.62rem 0.72rem;
+      transition: 0.2s ease;
+    }
+
+    input:focus, select:focus, button:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(11, 99, 246, 0.16);
+    }
+
+    .inline {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.45rem;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.45rem;
+    }
+
+    button {
+      background: #fff;
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:hover {
+      border-color: #b5c1d5;
+      transform: translateY(-1px);
+    }
+
+    .primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .primary:hover {
+      background: var(--accent-strong);
+      border-color: var(--accent-strong);
+    }
+
+    #status {
+      min-height: 1.2em;
+      margin: 0;
+      font-size: 0.86rem;
+      color: #334155;
+    }
+
+    #status.success { color: #0f7a45; }
+    #status.error { color: #b00020; }
+
+    #preview-wrap {
+      display: grid;
+      gap: 0.65rem;
+      min-height: calc(100vh - 2rem);
+      align-content: center;
+    }
+
+    #preview-meta {
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: clamp(1.25em, 3vw, 2.5em);
-      box-sizing: border-box;
+      justify-content: space-between;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      font-size: 0.84rem;
+      color: #485468;
+      padding: 0 0.2rem;
     }
 
     #preview {
       background: #fff;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      border: 1px solid #fff;
       aspect-ratio: 17 / 11;
-      width: min(1100px, 95vw);
-      max-height: calc(100vh - 240px);
+      width: min(1020px, 100%);
+      max-height: calc(100vh - 112px);
       display: flex;
       flex-direction: column;
-      padding: clamp(20px, 3vw, 32px);
-      box-sizing: border-box;
-      gap: 1em;
-      border-radius: 10px;
+      padding: clamp(14px, 2vw, 24px);
+      overflow: hidden;
     }
 
     #map {
       flex: 1;
-      min-height: 320px;
-      border: 3px solid #222;
+      min-height: 360px;
+      border: 2px solid #1f2937;
+      border-radius: 10px;
       position: relative;
       overflow: hidden;
-      border-radius: 8px;
-      /* pseudo-element creates bottom fade for text legibility */
     }
 
     #map::after {
@@ -77,166 +224,129 @@
       text-align: center;
       pointer-events: none;
       z-index: 1001;
+      color: #111;
     }
 
     #title-text {
-      bottom: 1.3em;
+      bottom: 1.35em;
       font-family: 'Roboto Condensed', sans-serif;
-      font-size: clamp(38px, 5vw, 52px);
+      font-size: clamp(34px, 4.9vw, 52px);
       font-weight: 700;
-      letter-spacing: 0;
+      line-height: 1;
+      text-transform: uppercase;
     }
 
     #coord-text {
       bottom: 0.7em;
       font-family: 'Roboto Condensed', sans-serif;
       font-size: clamp(14px, 2vw, 18px);
-      letter-spacing: 0;
-    }
-
-    #controls {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-      padding: 0.65em clamp(1em, 3vw, 2em);
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(8px);
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    #controls-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: grid;
-      gap: 0.5em;
-    }
-
-    .control-row {
-      display: flex;
-      gap: 0.5em;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    #controls input,
-    #controls button {
-      font-size: 1em;
-      padding: 0.5em 0.75em;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      background: #fff;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    #controls input {
-      flex: 1 1 220px;
-      min-width: 0;
-    }
-
-    #controls select {
-      font-size: 1em;
-      padding: 0.45em 2em 0.45em 0.75em;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      background: #fff;
-      appearance: none;
-      min-width: 160px;
-    }
-
-    .select-label {
-      display: flex;
-      align-items: center;
-      gap: 0.5em;
-      padding: 0.25em 0.5em;
-      border-radius: 6px;
-      background: rgba(0, 0, 0, 0.03);
-      font-size: 0.95em;
-    }
-
-    #controls input:focus,
-    #controls button:focus,
-    #controls button:hover,
-    #controls select:focus,
-    #controls select:hover {
-      border-color: #1a73e8;
-      box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
-      outline: none;
-    }
-
-    #controls button {
-      background: #111;
-      color: #fff;
-      cursor: pointer;
-      flex: 0 0 auto;
+      letter-spacing: 0.01em;
     }
 
     #zoom-text {
       position: absolute;
       top: 0.8em;
       right: 0.9em;
-      padding: 0.35em 0.6em;
-      font-family: 'Roboto Condensed', sans-serif;
+      padding: 0.32em 0.58em;
       font-size: 0.85em;
-      letter-spacing: 0.02em;
       background: rgba(255, 255, 255, 0.9);
       border-radius: 999px;
       box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12);
       z-index: 1001;
       pointer-events: none;
+      font-family: 'Roboto Condensed', sans-serif;
     }
 
-    #status {
-      font-size: 0.95em;
-      color: #333;
-      min-height: 1.2em;
-      padding: 0.25em 0.1em;
-      text-align: center;
-    }
+    @media (max-width: 1024px) {
+      #app-shell {
+        grid-template-columns: 1fr;
+      }
 
-    #status.info { color: #333; }
-    #status.success { color: #0a7a3d; }
-    #status.error { color: #b00020; }
+      #controls {
+        position: static;
+      }
+
+      #preview {
+        max-height: none;
+      }
+
+      #map {
+        min-height: 320px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div id="controls">
-    <div id="controls-inner">
-      <div class="control-row">
-        <input id="search" list="suggestions" placeholder="Search place…" />
-        <datalist id="suggestions"></datalist>
-        <button id="search-btn">Search</button>
-        <input id="title" placeholder="Map title…" />
+  <main id="app-shell">
+    <section id="controls">
+      <div class="brand">
+        <h1>MinMapArt Studio</h1>
+        <p>Create clean, printable location art in seconds—search, style, and export like a premium map poster tool.</p>
       </div>
-      <div class="control-row">
+
+      <div class="control-group">
+        <p class="group-title">Location</p>
+        <div class="field">
+          <label for="search">Search place</label>
+          <div class="inline">
+            <input id="search" list="suggestions" placeholder="Try: Barcelona, Spain" />
+            <button id="search-btn" class="primary">Search</button>
+          </div>
+          <datalist id="suggestions"></datalist>
+        </div>
         <button id="locate-btn">Use Current Location</button>
-        <button id="orientation-btn">Switch to Portrait</button>
-        <button id="export">Export PDF</button>
       </div>
-      <div class="control-row">
-        <label class="select-label">
-          Basemap
+
+      <div class="control-group">
+        <p class="group-title">Poster text</p>
+        <div class="field">
+          <label for="title">Map title</label>
+          <input id="title" placeholder="Map title…" />
+        </div>
+      </div>
+
+      <div class="control-group">
+        <p class="group-title">Style</p>
+        <div class="field">
+          <label for="basemap-select">Basemap</label>
           <select id="basemap-select">
-            <option value="lines">Toner Lines</option>
-            <option value="toner">Toner</option>
-            <option value="lite">Toner Lite</option>
+            <option value="lines">Toner Lines (minimal)</option>
+            <option value="toner">Toner (high contrast)</option>
+            <option value="lite">Toner Lite (soft)</option>
           </select>
-        </label>
-        <button id="copy-coords">Copy Coordinates</button>
-        <button id="reset-btn">Reset View</button>
+        </div>
+        <div class="button-grid">
+          <button id="orientation-btn">Switch to Portrait</button>
+          <button id="reset-btn">Reset View</button>
+        </div>
       </div>
-      <div id="status" class="info" aria-live="polite"></div>
-    </div>
-  </div>
-  <div id="page-container">
-    <div id="preview">
-      <div id="map">
-        <div id="title-text"></div>
-        <div id="coord-text"></div>
-        <div id="zoom-text"></div>
+
+      <div class="control-group">
+        <p class="group-title">Export & share</p>
+        <div class="button-grid">
+          <button id="copy-coords">Copy Coordinates</button>
+          <button id="copy-link">Copy Share Link</button>
+          <button id="export" class="primary" style="grid-column: 1 / -1;">Export PDF</button>
+        </div>
       </div>
-    </div>
-  </div>
+
+      <p id="status" class="info" aria-live="polite"></p>
+    </section>
+
+    <section id="preview-wrap">
+      <div id="preview-meta">
+        <span id="center-readout">Center: --</span>
+        <span id="style-readout">Style: Toner Lines</span>
+      </div>
+      <div id="preview">
+        <div id="map">
+          <div id="title-text"></div>
+          <div id="coord-text"></div>
+          <div id="zoom-text"></div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-geosearch@3.1.0/dist/bundle.min.js"></script>
